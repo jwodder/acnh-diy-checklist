@@ -612,14 +612,14 @@ mermaid table,Other,Pascal,
 mermaid vanity,Other,Pascal,
 mermaid wall clock,Other,Pascal,
 mermaid wall,Other,Pascal,
-garbage-heap flooring,Other,Catching garbage,15 trash
-garbage-heap wall,Other,Catching garbage,15 trash
-recycled boots,Other,Catching garbage,1 boot
-recycled-can thumb piano,Other,Catching garbage,3 empty cans
-succulent plant,Other,Catching garbage,1 empty can
-tire stack,Other,Catching garbage,3 old tires
-tire toy,Other,Catching garbage,1 old tire
-trash bags,Other,Catching garbage,15 trash
+garbage-heap flooring,Other,Catch garbage,15 trash
+garbage-heap wall,Other,Catch garbage,15 trash
+recycled boots,Other,Catch garbage,1 boot
+recycled-can thumb piano,Other,Catch garbage,3 empty cans
+succulent plant,Other,Catch garbage,1 empty can
+tire stack,Other,Catch garbage,3 old tires
+tire toy,Other,Catch garbage,1 old tire
+trash bags,Other,Catch garbage,15 trash
 fish bait,Other,Dig up clams,
 King Tut mask,Other,Get gold nuggets from rocks,
 frozen arch,Other,Snowboys,
