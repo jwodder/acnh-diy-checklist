@@ -3,7 +3,7 @@ import csv
 from   operator    import attrgetter
 import click
 
-class Recipe(namedtuple("Recipe", "name source_group source notes")):
+class Recipe(namedtuple("Recipe", "name category source_group source notes")):
     @property
     def name_key(self):
         return self.name.lower()
