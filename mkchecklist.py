@@ -84,18 +84,18 @@ def main(recipes_file, seasons_file, by, checked):
     if by == "name":
         show_seasons(seasons)
         print(r"\begin{Form}")
-        print(r"\begin{multicols}{2}")
+        print(r"\begin{multicols*}{2}")
         print(r"\begin{itemize}[noitemsep]")
         recipes.sort(key=attrgetter("name_key"))
         for r in recipes:
             print(r.check_item(checked=r.name in owned))
         print(r"\end{itemize}")
-        print(r"\end{multicols}")
+        print(r"\end{multicols*}")
         print(r"\end{Form}")
     elif by == "category":
         show_seasons(seasons)
         print(r"\begin{Form}")
-        print(r"\begin{multicols}{2}")
+        print(r"\begin{multicols*}{2}")
         recipes.sort(key=attrgetter("category_key"))
         for cat, catlist in groupby(recipes, attrgetter("category")):
             print(fr"\section*{{{cat}}}")
@@ -103,13 +103,13 @@ def main(recipes_file, seasons_file, by, checked):
             for r in catlist:
                 print(r.check_item(checked=r.name in owned))
             print(r"\end{itemize}")
-        print(r"\end{multicols}")
+        print(r"\end{multicols*}")
         print(r"\end{Form}")
     else:
         assert by == "source"
         season_dict = {s["name"]: s for s in seasons}
         print(r"\begin{Form}")
-        print(r"\begin{multicols}{2}")
+        print(r"\begin{multicols*}{2}")
         head1 = None
         head2 = None
         for r in recipes:
@@ -130,7 +130,7 @@ def main(recipes_file, seasons_file, by, checked):
                 head2 = r.source
             print(r.check_item(source=False, checked=r.name in owned))
         print(r"\end{itemize}")
-        print(r"\end{multicols}")
+        print(r"\end{multicols*}")
         print(r"\end{Form}")
     print(r"\end{document}")
 
