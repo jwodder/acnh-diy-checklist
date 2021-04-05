@@ -1,12 +1,27 @@
 from   collections import namedtuple
 import csv
+from   itertools   import groupby
 from   operator    import attrgetter
 import click
+
+CATEGORIES = [
+    "Tools",
+    "Housewares",
+    "Miscellaneous",
+    "Wall-mounted",
+    "Wallpaper/Floors/Rugs",
+    "Equipment",
+    "Other",
+]
 
 class Recipe(namedtuple("Recipe", "name category source_group source notes")):
     @property
     def name_key(self):
         return self.name.lower()
+
+    @property
+    def category_key(self):
+        return (CATEGORIES.index(self.category), self.name.lower())
 
     def check_item(self, source=True):
         if not source:
@@ -46,10 +61,11 @@ HEAD = r"""\documentclass{article}
 \usepackage[hidelinks]{hyperref}
 \def\LayoutCheckField#1#2{\item[#2] #1}
 \begin{document}
+\small
 """
 
 @click.command()
-@click.option("--by", type=click.Choice(["name", "source"]), default="name")
+@click.option("--by", type=click.Choice(["name", "source", "category"]), default="name")
 @click.argument("recipes_file", type=click.File())
 @click.argument("seasons_file", type=click.File())
 def main(recipes_file, seasons_file, by):
@@ -62,12 +78,24 @@ def main(recipes_file, seasons_file, by):
         show_seasons(seasons)
         print(r"\begin{Form}")
         print(r"\begin{multicols}{2}")
-        print(r"\small")
         print(r"\begin{itemize}[noitemsep]")
         recipes.sort(key=attrgetter("name_key"))
         for r in recipes:
             print(r.check_item())
         print(r"\end{itemize}")
+        print(r"\end{multicols}")
+        print(r"\end{Form}")
+    elif by == "category":
+        show_seasons(seasons)
+        print(r"\begin{Form}")
+        print(r"\begin{multicols}{2}")
+        recipes.sort(key=attrgetter("category_key"))
+        for cat, catlist in groupby(recipes, attrgetter("category")):
+            print(fr"\section*{{{cat}}}")
+            print(r"\begin{itemize}[noitemsep]")
+            for r in catlist:
+                print(r.check_item())
+            print(r"\end{itemize}")
         print(r"\end{multicols}")
         print(r"\end{Form}")
     else:
@@ -101,6 +129,7 @@ def main(recipes_file, seasons_file, by):
 
 def show_seasons(seasons):
     print(r"\begin{table}")
+    print(r"\small")
     print(r"\begin{center}")
     print(r"\caption*{\textbf{Balloon Seasons}}")
     print(r"\begin{tabular}{ll@{\enskip--\enskip}ll@{\enskip--\enskip}l}")
