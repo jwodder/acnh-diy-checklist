@@ -8,8 +8,10 @@ class Recipe(namedtuple("Recipe", "name source_group source notes")):
     def name_key(self):
         return self.name.lower()
 
-    def check_item(self):
-        if self.source_group == "Balloons":
+    def check_item(self, source=True):
+        if not source:
+            fmt = r"\checkitem{{{name}}}"
+        elif self.source_group == "Balloons":
             fmt = r"\checkitem{{{name}}} — Balloons ({source})"
         else:
             fmt = r"\checkitem{{{name}}} — {source}"
@@ -26,6 +28,7 @@ HEAD = r"""\documentclass{article}
 \usepackage{caption}
 \usepackage{fancyhdr}
 \usepackage{enumitem}
+\usepackage{indentfirst}
 \usepackage{lastpage}
 \usepackage{multicol}
 \usepackage{xcolor}
@@ -46,25 +49,54 @@ HEAD = r"""\documentclass{article}
 """
 
 @click.command()
+@click.option("--by", type=click.Choice(["name", "source"]), default="name")
 @click.argument("recipes_file", type=click.File())
 @click.argument("seasons_file", type=click.File())
-def main(recipes_file, seasons_file):
+def main(recipes_file, seasons_file, by):
     with recipes_file:
         recipes = [Recipe(**row) for row in csv.DictReader(recipes_file)]
     with seasons_file:
         seasons = list(csv.DictReader(seasons_file))
     print(HEAD)
-    show_seasons(seasons)
-    print(r"\begin{Form}")
-    print(r"\begin{multicols}{2}")
-    print(r"\small")
-    print(r"\begin{itemize}[noitemsep]")
-    recipes.sort(key=attrgetter("name_key"))
-    for r in recipes:
-        print(r.check_item())
-    print(r"\end{itemize}")
-    print(r"\end{multicols}")
-    print(r"\end{Form}")
+    if by == "name":
+        show_seasons(seasons)
+        print(r"\begin{Form}")
+        print(r"\begin{multicols}{2}")
+        print(r"\small")
+        print(r"\begin{itemize}[noitemsep]")
+        recipes.sort(key=attrgetter("name_key"))
+        for r in recipes:
+            print(r.check_item())
+        print(r"\end{itemize}")
+        print(r"\end{multicols}")
+        print(r"\end{Form}")
+    else:
+        assert by == "source"
+        season_dict = {s["name"]: s for s in seasons}
+        print(r"\begin{Form}")
+        print(r"\begin{multicols}{2}")
+        head1 = None
+        head2 = None
+        for r in recipes:
+            if r.source_group != head1:
+                if head2 is not None:
+                    print(r"\end{itemize}")
+                print(fr"\section*{{{r.source_group}}}")
+                head1 = r.source_group
+                head2 = None
+            if r.source != head2:
+                if head2 is not None:
+                    print(r"\end{itemize}")
+                print(fr"\subsection*{{{r.source}}}")
+                if r.source_group == "Balloons":
+                    print(r"Northern Hemisphere: {northern_start} -- {northern_end}".format_map(season_dict[r.source]))
+                    print(r"\par Southern Hemisphere: {southern_start} -- {southern_end}".format_map(season_dict[r.source]))
+                print(r"\begin{itemize}[noitemsep]")
+                head2 = r.source
+            print(r.check_item(source=False))
+        print(r"\end{itemize}")
+        print(r"\end{multicols}")
+        print(r"\end{Form}")
     print(r"\end{document}")
 
 def show_seasons(seasons):
