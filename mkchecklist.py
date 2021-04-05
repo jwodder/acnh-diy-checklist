@@ -23,13 +23,14 @@ class Recipe(namedtuple("Recipe", "name category source_group source notes")):
     def category_key(self):
         return (CATEGORIES.index(self.category), self.name.lower())
 
-    def check_item(self, source=True):
+    def check_item(self, source=True, checked=False):
+        cmd = r"\checkitem[checked]" if checked else r"\checkitem"
         if not source:
-            fmt = r"\checkitem{{{name}}}"
+            fmt = cmd + "{{{name}}}"
         elif self.source_group == "Balloons":
-            fmt = r"\checkitem{{{name}}} — Balloons ({source})"
+            fmt = cmd + "{{{name}}} — Balloons ({source})"
         else:
-            fmt = r"\checkitem{{{name}}} — {source}"
+            fmt = cmd + "{{{name}}} — {source}"
         if self.notes:
             fmt += " ({notes})"
         return fmt.format_map(self._asdict())
@@ -56,7 +57,7 @@ HEAD = r"""\documentclass{article}
 \fancyfoot[C]{}
 \renewcommand{\footrulewidth}{\headrulewidth}
 
-\newcommand{\checkitem}[1]{\CheckBox[width=5pt,height=5pt,bordercolor=black]{#1}}
+\newcommand{\checkitem}[2][]{\CheckBox[width=5pt,height=5pt,bordercolor=black,#1]{#2}}
 
 \usepackage[hidelinks]{hyperref}
 \def\LayoutCheckField#1#2{\item[#2] #1}
@@ -66,13 +67,19 @@ HEAD = r"""\documentclass{article}
 
 @click.command()
 @click.option("--by", type=click.Choice(["name", "source", "category"]), default="name")
+@click.option("--checked", type=click.File())
 @click.argument("recipes_file", type=click.File())
 @click.argument("seasons_file", type=click.File())
-def main(recipes_file, seasons_file, by):
+def main(recipes_file, seasons_file, by, checked):
     with recipes_file:
         recipes = [Recipe(**row) for row in csv.DictReader(recipes_file)]
     with seasons_file:
         seasons = list(csv.DictReader(seasons_file))
+    if checked:
+        with checked:
+            owned = {line.strip() for line in checked}
+    else:
+        owned = set()
     print(HEAD)
     if by == "name":
         show_seasons(seasons)
@@ -81,7 +88,7 @@ def main(recipes_file, seasons_file, by):
         print(r"\begin{itemize}[noitemsep]")
         recipes.sort(key=attrgetter("name_key"))
         for r in recipes:
-            print(r.check_item())
+            print(r.check_item(checked=r.name in owned))
         print(r"\end{itemize}")
         print(r"\end{multicols}")
         print(r"\end{Form}")
@@ -94,7 +101,7 @@ def main(recipes_file, seasons_file, by):
             print(fr"\section*{{{cat}}}")
             print(r"\begin{itemize}[noitemsep]")
             for r in catlist:
-                print(r.check_item())
+                print(r.check_item(checked=r.name in owned))
             print(r"\end{itemize}")
         print(r"\end{multicols}")
         print(r"\end{Form}")
@@ -121,7 +128,7 @@ def main(recipes_file, seasons_file, by):
                     print(r"\par Southern Hemisphere: {southern_start} -- {southern_end}".format_map(season_dict[r.source]))
                 print(r"\begin{itemize}[noitemsep]")
                 head2 = r.source
-            print(r.check_item(source=False))
+            print(r.check_item(source=False, checked=r.name in owned))
         print(r"\end{itemize}")
         print(r"\end{multicols}")
         print(r"\end{Form}")
