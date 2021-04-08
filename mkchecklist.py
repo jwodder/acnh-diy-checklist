@@ -89,6 +89,7 @@ def main(recipes_file, seasons_file, by, checked):
         recipes.sort(key=attrgetter("name_key"))
         for r in recipes:
             print(r.check_item(checked=r.name in owned))
+            owned.discard(r.name)
         print(r"\end{itemize}")
         print(r"\end{multicols*}")
         print(r"\end{Form}")
@@ -102,6 +103,7 @@ def main(recipes_file, seasons_file, by, checked):
             print(r"\begin{itemize}[noitemsep]")
             for r in catlist:
                 print(r.check_item(checked=r.name in owned))
+                owned.discard(r.name)
             print(r"\end{itemize}")
         print(r"\end{multicols*}")
         print(r"\end{Form}")
@@ -129,10 +131,16 @@ def main(recipes_file, seasons_file, by, checked):
                 print(r"\begin{itemize}[noitemsep]")
                 head2 = r.source
             print(r.check_item(source=False, checked=r.name in owned))
+            owned.discard(r.name)
         print(r"\end{itemize}")
         print(r"\end{multicols*}")
         print(r"\end{Form}")
     print(r"\end{document}")
+    if owned:
+        click.echo(
+            f"WARNING: unknown items listed in {checked.name}: {owned}",
+            err=True,
+        )
 
 def show_seasons(seasons):
     print(r"\begin{table}")
