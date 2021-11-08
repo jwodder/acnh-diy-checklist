@@ -12,6 +12,8 @@ CATEGORIES = [
     "Wallpaper/Floors/Rugs",
     "Equipment",
     "Other",
+    "Savory",
+    "Sweet",
 ]
 
 class Recipe(namedtuple("Recipe", "name category source_group source notes")):
