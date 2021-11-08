@@ -53,7 +53,7 @@ HEAD = r"""\documentclass{article}
 \fancyhead[L]{\emph{Animal Crossing: New Horizons} DIY Recipes}
 \fancyhead[C]{}
 \fancyhead[R]{[\thepage/\pageref{LastPage}]}
-\fancyfoot[L]{\footnotesize <\url{https://www.github.com/jwodder/acnh-diy-checklist}>}
+\fancyfoot[L]{\footnotesize <\url{https://github.com/jwodder/acnh-diy-checklist}>}
 \fancyfoot[C]{}
 \renewcommand{\footrulewidth}{\headrulewidth}
 
