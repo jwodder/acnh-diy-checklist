@@ -79,7 +79,7 @@ def main(recipes_file, seasons_file, by, checked):
         seasons = list(csv.DictReader(seasons_file))
     if checked:
         with checked:
-            owned = {line.strip() for line in checked}
+            owned = set(yield_lines(checked))
     else:
         owned = set()
     print(HEAD)
@@ -165,6 +165,14 @@ def show_seasons(seasons):
     print(r"\end{tabular}")
     print(r"\end{center}")
     print(r"\end{table}")
+
+
+def yield_lines(fp):
+    for line in fp:
+        line = line.strip()
+        if line and not line.startswith('#'):
+            yield line
+
 
 if __name__ == "__main__":
     main()
