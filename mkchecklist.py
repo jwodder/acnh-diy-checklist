@@ -9,6 +9,7 @@ CATEGORIES = [
     "Housewares",
     "Miscellaneous",
     "Wall-mounted",
+    "Ceiling Decor",
     "Wallpaper/Floors/Rugs",
     "Equipment",
     "Other",
